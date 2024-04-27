@@ -17,7 +17,7 @@ ys = torch.sin(xs)
 
 plt.ion()
 fig, (ax1, ax2) = plt.subplots(1, 2)
-plt.show(block=False)
+fig.show(block=False)
 
 
 # class MLP(torch.nn.Module):
@@ -42,14 +42,14 @@ def visualize():
         val_y_preds = model(val_xs)
         activation_ys = activation(val_xs)
 
-    plt.clf()
+    fig.clf()
     ax1.scatter(xs, ys, color='blue')
     ax1.scatter(val_xs, val_y_preds, color='orange')
 
     ax2.scatter(val_xs, activation_ys, color='yellow')
 
-    plt.draw()
-    plt.pause(0.01)
+    fig.draw()
+    fig.pause(0.01)
 
 
 for epoch in range(10000):
