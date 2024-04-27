@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import time
 
 from components import MLP
+from activations import PiecewiseActivation
 
 
-hidden = 100
-lr = 0.0001
-
+hidden = 200
+lr = 0.001
 
 xs = torch.rand(size=(100, 1)) * 10
 val_xs = torch.rand(size=(100, 1)) * 10
@@ -16,6 +16,7 @@ print(xs)
 ys = torch.sin(xs)
 
 plt.ion()
+fig, (ax1, ax2) = plt.subplots(1, 2)
 plt.show(block=False)
 
 
@@ -31,19 +32,25 @@ plt.show(block=False)
 #         x = self.fc2(x)
 #         return x
 
-model = MLP([1, hidden, hidden, 1])
+activation = PiecewiseActivation()
+model = MLP([1, hidden, 1])
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
 
 def visualize():
     with torch.no_grad():
         val_y_preds = model(val_xs)
+        activation_ys = activation(val_xs)
 
     plt.clf()
-    plt.scatter(xs, ys, color='blue')
-    plt.scatter(val_xs, val_y_preds, color='orange')
+    ax1.scatter(xs, ys, color='blue')
+    ax1.scatter(val_xs, val_y_preds, color='orange')
+
+    ax2.scatter(val_xs, activation_ys, color='yellow')
+
     plt.draw()
     plt.pause(0.01)
+
 
 for epoch in range(10000):
     y_pred = model(xs)
