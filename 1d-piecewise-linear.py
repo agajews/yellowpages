@@ -7,13 +7,15 @@ import time
 from activations import PiecewiseActivation
 
 
+training_pts = 1000
+training_scale = 2.0
 hidden = 200
 lr = 0.0001
 
-xs = torch.rand(size=(100, 1)) * 10 - 5
-val_xs = torch.rand(size=(100, 1)) * 10 - 5
+xs = torch.rand(size=(training_pts, 1)) * training_scale * 2 - training_scale
+val_xs = torch.rand(size=(training_pts, 1)) * training_scale * 2 - training_scale
+ys = torch.sin(xs * 30 / training_scale)
 print(xs)
-ys = torch.sin(xs)
 
 plt.ion()
 plt.show(block=False)
@@ -40,8 +42,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
 def visualize():
     with torch.no_grad():
-        # val_y_preds = model(val_xs)
-        val_y_preds = model.activation(val_xs)
+        val_y_preds = model(val_xs)
+        # val_y_preds = model.activation(val_xs)
 
     plt.clf()
     plt.scatter(xs, ys, color='blue')
@@ -56,14 +58,9 @@ for epoch in range(10000):
     optimizer.zero_grad()
     loss.backward()
 
-    print('y grads', model.activation.ys.grad)
+    # print('y grads', model.activation.ys.grad)
 
-    break
     optimizer.step()
 
     if epoch % 10 == 0:
         visualize()
-
-    break
-
-time.sleep(100)
