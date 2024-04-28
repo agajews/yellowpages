@@ -3,45 +3,41 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import time
 
-# from components import MLP
-from activations import PiecewiseActivation
+from components import MLP
 
 
+training_pts = 1000
+training_scale = 2.0
 hidden = 200
-lr = 0.0001
+lr = 0.0005
 
-xs = torch.rand(size=(100, 1)) * 10 - 5
-val_xs = torch.rand(size=(100, 1)) * 10 - 5
-print(xs)
-ys = torch.sin(xs)
+xs = torch.rand(size=(training_pts, 1)) * training_scale * 2 - training_scale
+val_xs = torch.rand(size=(training_pts, 1)) * training_scale * 2 - training_scale
+ys = torch.sin(xs * 30 / training_scale)
 
 plt.ion()
 plt.show(block=False)
 
 
-class MLP(torch.nn.Module):
-    def __init__(self):
-        super(MLP, self).__init__()
-        self.fc1 = torch.nn.Linear(1, hidden)
-        self.fc2 = torch.nn.Linear(hidden, 1)
-        self.activation = PiecewiseActivation()
+# class MLP(torch.nn.Module):
+#     def __init__(self):
+#         super(MLP, self).__init__()
+#         self.fc1 = torch.nn.Linear(1, hidden)
+#         self.fc2 = torch.nn.Linear(hidden, 1)
 
-    def forward(self, x):
-        x = self.fc1(x)
-        x = self.activation(x)
-        x = self.fc2(x)
-        return x
+#     def forward(self, x):
+#         x = self.fc1(x)
+#         x = F.relu(x)
+#         x = self.fc2(x)
+#         return x
 
-# activation = PiecewiseActivation()
-# model = MLP([1, hidden, 1], activation=activation)
-model = MLP()
+model = MLP([1, hidden, hidden, 1])
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
 
 def visualize():
     with torch.no_grad():
-        # val_y_preds = model(val_xs)
-        val_y_preds = model.activation(val_xs)
+        val_y_preds = model(val_xs)
 
     plt.clf()
     plt.scatter(xs, ys, color='blue')
@@ -55,15 +51,7 @@ for epoch in range(10000):
     print(f"epoch {epoch}: {loss}")
     optimizer.zero_grad()
     loss.backward()
-
-    print('y grads', model.activation.ys.grad)
-
-    break
     optimizer.step()
 
     if epoch % 10 == 0:
         visualize()
-
-    break
-
-time.sleep(100)
